@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "StockTradeError",
+  "namespace": "com.example.kstreamsdatacontracts.avro",
+  "fields": [
+    {"name": "original_trade", "type": {
+      "type": "record",
+      "name": "StockTrade",
+      "fields": [
+        {"name": "side", "type": {"type": "enum", "name": "Side", "symbols": ["BUY", "SELL", "UNKNOWN"]}},
+        {"name": "quantity", "type": "int"},
+        {"name": "symbol", "type": "string"},
+        {"name": "price", "type": "double"},
+        {"name": "account", "type": "string"},
+        {"name": "userid", "type": "string"}
+      ]
+    }},
+    {"name": "error_message", "type": "string"},
+    {"name": "failed_rule", "type": "string"},
+    {"name": "timestamp", "type": "long"}
+  ]
+}

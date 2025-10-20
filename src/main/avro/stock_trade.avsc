@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "StockTrade",
+  "namespace": "com.example.kstreamsdatacontracts.avro",
+  "fields": [
+    {"name": "side", "type": {"type": "enum", "name": "Side", "symbols": ["BUY", "SELL", "UNKNOWN"]}},
+    {"name": "quantity", "type": "int"},
+    {"name": "symbol", "type": "string"},
+    {"name": "price", "type": "double"},
+    {"name": "account", "type": "string"},
+    {"name": "userid", "type": "string"}
+  ]
+}
