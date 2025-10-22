@@ -65,6 +65,10 @@ fi
 [ -n "$API_KEY" ] || die "SCHEMA_REGISTRY_API_KEY is not set"
 [ -n "$API_SECRET" ] || die "SCHEMA_REGISTRY_API_SECRET is not set"
 
+# Debug: Log the API key and masked secret
+echo "Debug: Using SCHEMA_REGISTRY_API_KEY: $API_KEY"
+echo "Debug: Using SCHEMA_REGISTRY_API_SECRET: [MASKED]"
+
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 if ! command -v curl >/dev/null 2>&1; then
@@ -107,66 +111,6 @@ if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
   SCHEMA_ID=$(echo "$HTTP_BODY" | jq -r '.id // empty')
   echo "Registered schema id: $SCHEMA_ID"
 
-  # Build data contract metadata with field rules for Confluent Data Contracts
-  METADATA_PAYLOAD=$(jq -n --arg d "$DESCRIPTION" --arg o "$OWNER" --arg t "$TAGS" '{
-    properties: {
-      "business.metadata": {
-        description: $d,
-        owner: $o,
-        tags: ($t | split(","))
-      },
-      "confluent:contracts": {
-        rules: [
-          {
-            name: "quantity_check",
-            kind: "CONDITION",
-            mode: "WRITE",
-            type: "CEL",
-            expr: "message.quantity > 0",
-            action: "DLQ",
-            dlqTopic: "stock_trades.dlq"
-          },
-          {
-            name: "symbol_check",
-            kind: "CONDITION",
-            mode: "WRITE",
-            type: "CEL",
-            expr: "message.symbol.matches(\"^[A-Z]{1,5}$\")",
-            action: "DLQ",
-            dlqTopic: "stock_trades.dlq"
-          },
-          {
-            name: "account_check",
-            kind: "CONDITION",
-            mode: "WRITE",
-            type: "CEL",
-            expr: "message.account.matches(\"^ACC[0-9]{3}$\")",
-            action: "DLQ",
-            dlqTopic: "stock_trades.dlq"
-          }
-        ]
-      }
-    }
-  }')
-
-  # Attach metadata to the subject for data contract
-  echo "Attaching data contract metadata (business metadata + field rules) to subject: $SUBJECT"
-  METADATA_RESPONSE=$(curl -s -w "\n%{http_code}" --user "$API_KEY:$API_SECRET" \
-    -X PUT "$SCHEMA_REGISTRY_URL/subjects/$SUBJECT/metadata" \
-    -H "Content-Type: application/json" \
-    -d "$METADATA_PAYLOAD")
-
-  METADATA_BODY=$(sed '$d' <<<"$METADATA_RESPONSE" || true)
-  METADATA_STATUS=$(tail -n1 <<<"$METADATA_RESPONSE" || true)
-
-  # Check metadata attachment success
-  if [[ "$METADATA_STATUS" =~ ^2[0-9][0-9]$ ]]; then
-    echo "Data contract metadata attached successfully:" 
-    echo "$METADATA_BODY" | jq . || echo "$METADATA_BODY"
-  else
-    echo "WARNING: Failed to attach metadata (status=${METADATA_STATUS})" >&2
-    echo "Response: $METADATA_BODY" >&2
-  fi
   exit 0
 else
   # Registration failed
