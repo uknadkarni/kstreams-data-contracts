@@ -9,3 +9,6 @@ target/
 scripts/set-env.sh
 # ignore runtime logs
 app.log
+
+# Ignore build artifacts
+target/

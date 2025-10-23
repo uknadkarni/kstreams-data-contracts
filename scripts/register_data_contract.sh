@@ -40,6 +40,8 @@ SCHEMA_REGISTRY_URL=${SCHEMA_REGISTRY_URL:-https://psrc-lq2dm.us-east-2.aws.conf
 API_KEY=${SCHEMA_REGISTRY_API_KEY:-}
 API_SECRET=${SCHEMA_REGISTRY_API_SECRET:-}
 SUBJECT=${SUBJECT:-stock_trades-value}
+CONFLUENT_ENVIRONMENT_ID=${CONFLUENT_ENVIRONMENT_ID:-}
+SCHEMA_REGISTRY_CLUSTER_ID=${SCHEMA_REGISTRY_CLUSTER_ID:-}
 
 # Business metadata (optional)
 DESCRIPTION=${DESCRIPTION:-"Stock trades data contract - raw trade messages"}
@@ -65,9 +67,7 @@ fi
 [ -n "$API_KEY" ] || die "SCHEMA_REGISTRY_API_KEY is not set"
 [ -n "$API_SECRET" ] || die "SCHEMA_REGISTRY_API_SECRET is not set"
 
-# Debug: Log the API key and masked secret
-echo "Debug: Using SCHEMA_REGISTRY_API_KEY: $API_KEY"
-echo "Debug: Using SCHEMA_REGISTRY_API_SECRET: [MASKED]"
+# Do not print secrets or API keys to stdout/stderr to avoid leaking them in logs
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
@@ -110,6 +110,8 @@ if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
   echo "$HTTP_BODY" | jq .
   SCHEMA_ID=$(echo "$HTTP_BODY" | jq -r '.id // empty')
   echo "Registered schema id: $SCHEMA_ID"
+
+  echo "Note: Business metadata and data quality rules must be added manually in Confluent Cloud Console > Stream Governance > Data Contracts for the subject $SUBJECT."
 
   exit 0
 else
