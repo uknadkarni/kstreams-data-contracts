@@ -71,7 +71,9 @@ export KAFKA_API_KEY="<runtime-kafka-key>"
 export KAFKA_API_SECRET="<runtime-kafka-secret>"
 export SCHEMA_REGISTRY_API_KEY="<runtime-sr-key>"
 export SCHEMA_REGISTRY_API_SECRET="<runtime-sr-secret>"
-```**b) Admin Service Account** (for schema registration and Data Contracts management)
+```
+
+**b) Admin Service Account** (for schema registration and Data Contracts management)
 - **Purpose**: Used by scripts and operators to register schemas and manage Data Contracts rules
 - **Schema Registry API Key/Secret**: Create a Schema Registry API key with **DataSteward** role
   - Role: **DataSteward** (can create/update schemas and manage Data Contracts rules)
