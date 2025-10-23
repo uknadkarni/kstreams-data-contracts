@@ -7,3 +7,5 @@ target/
 
 # Environment scripts with potential secrets
 scripts/set-env.sh
+# ignore runtime logs
+app.log

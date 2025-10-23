@@ -1,0 +1,59 @@
+{
+  "rules": [
+    {
+      "name": "quantity_positive",
+      "kind": "CONDITION",
+      "mode": "WRITE",
+      "type": "CEL",
+      "expr": "message.quantity > 0",
+      "action": "DLQ",
+      "params": {
+        "dlq.topic": "stock_trades.dlq"
+      }
+    },
+    {
+      "name": "price_positive",
+      "kind": "CONDITION",
+      "mode": "WRITE",
+      "type": "CEL",
+      "expr": "message.price > 0",
+      "action": "DLQ",
+      "params": {
+        "dlq.topic": "stock_trades.dlq"
+      }
+    },
+    {
+      "name": "symbol_not_empty",
+      "kind": "CONDITION",
+      "mode": "WRITE",
+      "type": "CEL",
+      "expr": "message.symbol != \"\"",
+      "action": "DLQ",
+      "params": {
+        "dlq.topic": "stock_trades.dlq"
+      }
+    },
+    {
+      "name": "account_not_empty",
+      "kind": "CONDITION",
+      "mode": "WRITE",
+      "type": "CEL",
+      "expr": "message.account != \"\"",
+      "action": "DLQ",
+      "params": {
+        "dlq.topic": "stock_trades.dlq"
+      }
+    },
+    {
+      "name": "userid_not_empty",
+      "kind": "CONDITION",
+      "mode": "WRITE",
+      "type": "CEL",
+      "expr": "message.userid != \"\"",
+      "action": "DLQ",
+      "params": {
+        "dlq.topic": "stock_trades.dlq"
+      }
+    }
+  ]
+}
